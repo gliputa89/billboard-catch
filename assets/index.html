@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Katalog assetów — Billboard Catch</title>
+  <link rel="icon" href="../logo.svg" type="image/svg+xml">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="catalog.css">
+</head>
+<body>
+  <header class="top">
+    <div class="top-left">
+      <a class="back" href="../">← Gra</a>
+      <h1>Katalog spadających assetów</h1>
+      <p class="sub">Podgląd wszystkich elementów z nazwami i ID. Wyłączone pozycje <b>nie pojawiają się w grze</b> (zapis w przeglądarce).</p>
+    </div>
+    <div class="top-right">
+      <img src="../logo.svg" alt="znajdzreklame.pl" class="logo" onerror="this.src='https://www.znajdzreklame.pl/logo.svg'">
+      <div class="stats" id="stats">—</div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <input type="search" id="search" placeholder="Szukaj po nazwie, ID, opisie…" autocomplete="off">
+    <div class="toolbar-btns">
+      <button type="button" id="btn-all">Włącz wszystkie</button>
+      <button type="button" id="btn-none">Wyłącz wszystkie</button>
+      <button type="button" id="btn-reset">Reset (domyślne)</button>
+    </div>
+  </div>
+
+  <main id="sections"></main>
+
+  <footer class="foot">
+    <span>Wyłączone ID:</span>
+    <code id="disabled-json">[]</code>
+    <span class="foot-note">Billboard Catch • znajdzreklame.pl</span>
+  </footer>
+
+  <script src="../lib/falling-items.js"></script>
+  <script src="catalog.js"></script>
+</body>
+</html>

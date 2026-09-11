@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Billboard Catch — znajdzreklame.pl</title>
+  <meta name="description" content="Billboard Catch — łap reklamy, zdobywaj punkty, pobij rekord. Gra arcade od znajdzreklame.pl">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
+  <link rel="icon" href="logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="stage">
+    <div class="game-wrap" id="wrap">
+      <div class="diff-badge hidden" id="diff-badge" aria-hidden="true">Normalny</div>
+      <canvas id="game" width="960" height="640" aria-label="Billboard Catch"></canvas>
+
+      <!-- EKRAN STARTOWY -->
+      <section class="overlay" id="start">
+        <div class="panel panel-start">
+          <nav class="start-tabs" role="tablist" aria-label="Menu startowe">
+            <button type="button" class="start-tab active" data-tab="play" role="tab" aria-selected="true" id="tab-btn-play">Gra</button>
+            <button type="button" class="start-tab" data-tab="settings" role="tab" aria-selected="false" id="tab-btn-settings">Ustawienia</button>
+          </nav>
+
+          <div class="start-tab-panel" id="tab-play" role="tabpanel">
+          <div class="brand-tag">
+            <img src="logo.svg" alt="znajdzreklame.pl" class="brand-logo brand-logo--start"
+                 onerror="this.onerror=null;this.src='https://www.znajdzreklame.pl/logo.svg'">
+            <span>przedstawia</span>
+          </div>
+          <h1 class="title"><span>BILLBOARD</span><span class="accent">CATCH</span></h1>
+          <p class="slogan">ZŁAP. ZDOBĄDŹ. POBIJ REKORD.</p>
+
+          <div class="cta">
+            <div class="cta-main">ZŁAP REKLAMĘ!</div>
+            <div class="cta-sub"><kbd>←</kbd> <kbd>→</kbd> poruszaj się</div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item good"><span class="dot"></span>ŁAP: reklamy, billboardy, DOOH, paczkomaty</div>
+            <div class="legend-item brand"><span class="dot"></span>ZBIERAJ: litery i logo znajdzreklame.pl → małe pkt + bonus za postęp, +10 000 za komplet</div>
+            <div class="legend-item bad"><span class="dot"></span>UNIKAJ: bomby, faktury, trudnych klientów, zniszczony format (−2)</div>
+            <div class="legend-item pu"><span class="dot"></span>POWER-UPY: serca, spowolnienie, zasięg, mini auto</div>
+          </div>
+
+          <button class="btn btn-primary" id="btn-start">START</button>
+          <div class="hint">…albo naciśnij dowolny klawisz</div>
+
+          <div class="mini-board">
+            <div class="mini-board-title">🏆 TOP 5</div>
+            <ol id="mini-board"></ol>
+            <div class="challenge" id="challenge"></div>
+          </div>
+          </div><!-- /tab-play -->
+
+          <div class="start-tab-panel hidden" id="tab-settings" role="tabpanel">
+            <h2 class="settings-title">Ustawienia gry</h2>
+            <p class="settings-sub">Dostosuj tempo i gęstość rozgrywki. Zapisuje się automatycznie.</p>
+
+            <div class="preset-row" id="preset-row">
+              <!-- wypełnia game.js -->
+            </div>
+
+            <div class="sliders" id="settings-sliders">
+              <!-- wypełnia game.js -->
+            </div>
+
+            <div class="settings-actions">
+              <button type="button" class="btn btn-ghost" id="btn-settings-reset">Przywróć Normalny</button>
+              <button type="button" class="btn btn-primary" id="btn-settings-play">Graj z tymi ustawieniami</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- EKRAN KOŃCA GRY -->
+      <section class="overlay hidden" id="gameover">
+        <div class="panel panel-over">
+          <div class="over-left">
+            <h2 class="over-title">KONIEC!</h2>
+            <div class="final-score"><span id="final-score">0</span> <small>PKT</small></div>
+            <div class="stats">
+              <div>ZŁAPANE REKLAMY: <b id="stat-caught">0</b></div>
+              <div>NAJLEPSZE COMBO: <b id="stat-combo">x0</b></div>
+            </div>
+            <div class="record" id="record-box"></div>
+
+            <div class="name-entry hidden" id="name-entry">
+              <div class="name-entry-title">Wchodzisz do TOP 10! Wpisz imię:</div>
+              <form id="name-form" autocomplete="off">
+                <input id="name-input" type="text" maxlength="12" placeholder="TWOJE IMIĘ" spellcheck="false">
+                <button type="submit" class="btn btn-small">ZAPISZ</button>
+              </form>
+            </div>
+
+            <button class="btn btn-primary" id="btn-again">ZAGRAJ JESZCZE RAZ</button>
+            <div class="hint">Enter / Spacja — szybki restart</div>
+          </div>
+
+          <div class="over-right">
+            <div class="board-title">🏆 BILLBOARD CATCH — TOP 10</div>
+            <table class="board">
+              <thead><tr><th>#</th><th>Gracz</th><th class="r">Wynik</th></tr></thead>
+              <tbody id="board-body"></tbody>
+            </table>
+            <div class="challenge" id="challenge-over"></div>
+          </div>
+
+          <div class="brand-footer">
+            <img src="logo.svg" alt="znajdzreklame.pl" class="brand-logo brand-logo--footer brand-logo--light"
+                 onerror="this.onerror=null;this.src='https://www.znajdzreklame.pl/logo.svg'">
+            <span>Billboardy • Citylighty • Wielki Format • Oklejanie autobusów</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <footer class="page-footer">
+      <img src="logo.svg" alt="znajdzreklame.pl" class="brand-logo brand-logo--page"
+           onerror="this.onerror=null;this.src='https://www.znajdzreklame.pl/logo.svg'">
+      <span class="foot-sep">•</span>
+      <span>Billboardy • Citylighty • Wielki Format • Oklejanie autobusów</span>
+      <a class="foot-link" href="assets/">Katalog assetów</a>
+      <button type="button" class="foot-link foot-btn" id="btn-open-settings">Ustawienia</button>
+      <button class="mute" id="btn-mute" title="Dźwięk (M)" aria-label="Wyłącz dźwięk">🔊</button>
+    </footer>
+  </main>
+
+  <script src="lib/falling-items.js"></script>
+  <script src="lib/game-settings.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
