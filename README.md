@@ -78,7 +78,7 @@ Punkty za zwykłe reklamy mnożone są przez combo i bonus 2x. Power-upów możn
 
 ## Tablica wyników
 
-TOP 10 jest zapisywany w **Xano** (backend w folderze `xano/`). Gra ładuje ranking przez API i po wpisaniu imienia wysyła wynik na serwer. Przy braku sieci używa kopii z `localStorage`; gdy ranking jest pusty, tablica pozostaje pusta (bez przykładowych wyników).
+TOP 10 jest zapisywany w **Xano** (backend w folderze `xano/`). Gra ładuje ranking przez API i po wpisaniu imienia wysyła wynik na serwer. **Każda rozgrywka trafia do tabeli** `leaderboard_score` (pełna historia), a na publicznej tablicy widać **tylko najwyższy wynik danego imienia**. Przy braku sieci używa kopii z `localStorage`; gdy ranking jest pusty, tablica pozostaje pusta (bez przykładowych wyników).
 
 Przy zapisie wyniku backend dostaje też identyfikatory przeglądarki (niewidoczne na publicznej tablicy — widać je w tabeli Xano `leaderboard_score`):
 
@@ -94,11 +94,10 @@ Te same `visitor_id` / `fingerprint` / `ip` przy różnych nickach = prawie na p
 - API: `https://xeow-pqh4-ha4j.f2.xano.io/api:gra-ads-catcher:v1/leaderboard`
 - Klient w grze: `lib/xano-leaderboard.js`
 
-Wyczyść lokalny rekord / cache tablicy w konsoli:
+Wyczyść lokalny cache tablicy w konsoli:
 
 ```js
 localStorage.removeItem('bbcatch.board.v1');
-localStorage.removeItem('bbcatch.best.v1');
 ```
 
 ## Ustawienia gry

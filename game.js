@@ -37,7 +37,6 @@
   const XL = window.BBC_XanoLeaderboard;
   const LS = {
     board: "bbcatch.board.v1",
-    best: "bbcatch.best.v1",
     name: "bbcatch.name.v1",
     mute: "bbcatch.mute.v1",
     debug: (GS && GS.LS_DEBUG) || "bbcatch.debug.v1",
@@ -2817,15 +2816,6 @@
       stroke: "rgba(0,0,0,.5)",
       lw: 4,
     });
-    text(
-      `REKORD ${fmt(Math.max(personalBest, G.score))}`,
-      22,
-      62,
-      14,
-      "rgba(255,255,255,.8)",
-      { align: "left", weight: 700, stroke: "rgba(0,0,0,.5)", lw: 3 },
-    );
-
     if (DEBUG) {
       text("∞ DEBUG", W - 20, 28, 12, "#5eead4", {
         align: "right",
@@ -3472,9 +3462,8 @@
   }
 
   // ------------------------------------------------------------------
-  // Tablica wyników i rekord
+  // Tablica wyników
   // ------------------------------------------------------------------
-  let personalBest = store.get(LS.best, 0);
   let boardCache = null;
 
   function normalizeBoardEntry(e) {
@@ -3488,11 +3477,33 @@
     return { name, score, date: e.date ?? e.created_at ?? null };
   }
 
+  function uniqueBestByName(list) {
+    const best = new Map();
+    for (const e of list) {
+      const prev = best.get(e.name);
+      if (!prev || e.score > prev.score) {
+        best.set(e.name, e);
+        continue;
+      }
+      if (e.score === prev.score) {
+        const eDate = e.date == null ? Infinity : Number(e.date);
+        const pDate = prev.date == null ? Infinity : Number(prev.date);
+        if (eDate < pDate) best.set(e.name, e);
+      }
+    }
+    return [...best.values()].sort((a, b) => {
+      if (b.score !== a.score) return b.score - a.score;
+      const ad = a.date == null ? 0 : Number(a.date);
+      const bd = b.date == null ? 0 : Number(b.date);
+      return ad - bd;
+    });
+  }
+
   function loadBoard() {
-    if (Array.isArray(boardCache)) return boardCache;
+    if (Array.isArray(boardCache)) return uniqueBestByName(boardCache).slice(0, 10);
     const cached = store.get(LS.board, null);
     if (Array.isArray(cached)) {
-      return cached.map(normalizeBoardEntry).filter(Boolean);
+      return uniqueBestByName(cached.map(normalizeBoardEntry).filter(Boolean)).slice(0, 10);
     }
     return [];
   }
@@ -3519,13 +3530,17 @@
 
   function addToBoardLocal(name, score) {
     const b = loadBoard().slice();
+    const existingIdx = b.findIndex((e) => e.name === name);
+    if (existingIdx >= 0 && score <= b[existingIdx].score) {
+      return existingIdx;
+    }
     const entry = { name, score, date: Date.now() };
-    b.push(entry);
-    b.sort((p, q) => q.score - p.score);
-    const cut = b.slice(0, 10);
+    if (existingIdx >= 0) b[existingIdx] = entry;
+    else b.push(entry);
+    const cut = uniqueBestByName(b).slice(0, 10);
     boardCache = cut;
     store.set(LS.board, cut);
-    return cut.indexOf(entry);
+    return cut.findIndex((e) => e.name === name);
   }
 
   async function addToBoard(name, score) {
@@ -3534,11 +3549,9 @@
         const { board, rank } = await XL.submitScore(name, score);
         boardCache = board;
         store.set(LS.board, board);
-        if (Number.isFinite(rank) && rank > 0)
-          return Math.min(rank - 1, board.length - 1);
-        return board.findIndex(
-          (e) => e.name === name && e.score === Math.round(score),
-        );
+        if (Number.isFinite(rank) && rank > 0 && rank <= board.length)
+          return rank - 1;
+        return board.findIndex((e) => e.name === name);
       } catch {
         /* fallback lokalny */
       }
@@ -3747,25 +3760,10 @@
     stopMusic(true);
     sfx.over();
     const score = Math.round(G.score);
-    const isRecord = score > personalBest;
-    const prevBest = personalBest;
-    if (isRecord) {
-      personalBest = score;
-      store.set(LS.best, score);
-    }
 
     $("#final-score").textContent = fmt(score);
     $("#stat-caught").textContent = fmt(G.caught);
     $("#stat-combo").textContent = "x" + G.bestCombo;
-    const rb = $("#record-box");
-    if (isRecord) {
-      rb.className = "record new";
-      rb.innerHTML = `NOWY REKORD!<span class="sub">${fmt(score)} PKT${prevBest ? ` • poprzedni: ${fmt(prevBest)}` : ""}</span>`;
-    } else {
-      rb.className = "record";
-      const diffPts = prevBest - score;
-      rb.innerHTML = `Twój rekord: ${fmt(prevBest)} PKT<span class="sub">Brakuje Ci ${diffPts <= prevBest * 0.5 ? "tylko " : ""}${fmt(diffPts)} punktów!</span>`;
-    }
     const ne = $("#name-entry");
     if (qualifies(score)) {
       ne.classList.remove("hidden");

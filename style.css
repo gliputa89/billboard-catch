@@ -332,26 +332,6 @@ kbd {
 }
 .stats b { color: var(--brand-2); }
 
-.record {
-  margin: 1.4cqw auto 1.2cqw;
-  padding: 1cqw 1.6cqw;
-  border-radius: 1cqw;
-  font-size: 1.7cqw;
-  font-weight: 700;
-  display: inline-block;
-  background: rgba(255, 255, 255, .07);
-}
-.record.new {
-  background: linear-gradient(90deg, #ffb703, #ff7a00);
-  color: var(--ink);
-  font-size: 2.4cqw;
-  font-weight: 900;
-  letter-spacing: .05em;
-  animation: pulse 1.2s ease-in-out infinite;
-  box-shadow: 0 0 3cqw rgba(255, 183, 3, .5);
-}
-.record .sub { display: block; font-size: 1.4cqw; font-weight: 500; opacity: .85; margin-top: .2cqw; }
-
 .name-entry {
   margin: 0 auto 1.2cqw;
   padding: 1cqw 1.4cqw;
