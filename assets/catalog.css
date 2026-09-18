@@ -103,7 +103,6 @@ body {
 .section-head.bad h2 { color: var(--bad); }
 .section-head.special h2 { color: var(--special); }
 .section-head.powerup h2 { color: #4cc9f0; }
-.section-head.brand h2 { color: #ff7a00; }
 .kind-powerup { background: rgba(76, 201, 240, .2); color: #4cc9f0; }
 
 .grid {
@@ -230,6 +229,8 @@ body {
   max-width: 100%;
 }
 .foot-note { margin-left: auto; opacity: .6; }
+
+body:not(.debug-mode) .admin-only { display: none !important; }
 
 .empty {
   grid-column: 1 / -1;

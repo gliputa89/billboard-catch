@@ -2,15 +2,31 @@
   'use strict';
 
   const FI = window.BBC_FallingItems;
+  const GS = window.BBC_GameSettings;
+  const ADMIN = !!(GS && typeof GS.readDebugMode === 'function' && GS.readDebugMode());
   const SECTIONS = [
     { kind: 'good', title: 'ŁAP — reklamy i elementy kampanii', hint: 'zielone' },
-    { kind: 'brand', title: 'ZBIERAJ — klocki napisu znajdzreklame.pl', hint: 'pomarańczowe • +10 000 za komplet' },
     { kind: 'bad', title: 'UNIKAJ — przeszkody', hint: 'czerwone' },
     { kind: 'special', title: 'BONUSY specjalne', hint: 'złote' },
     { kind: 'powerup', title: 'POWER-UPY', hint: 'niebieskie' },
   ];
 
+  document.body.classList.toggle('debug-mode', ADMIN);
+  if (GS && typeof GS.setWritable === 'function') GS.setWritable(ADMIN);
+
+  const sub = document.getElementById('catalog-sub');
+  if (sub) {
+    sub.innerHTML = ADMIN
+      ? 'Podgląd wszystkich elementów. Przełącznik <b>W grze / Wyłączone</b> zapisuje się na serwerze i dotyczy wszystkich graczy.'
+      : 'Podgląd wszystkich elementów z nazwami i ID. Lista włączonych w grze jest wspólna i pochodzi z serwera.';
+  }
+
   let logoImg = null;
+
+  function persistDisabled() {
+    if (!ADMIN || !GS || typeof GS.saveDisabled !== 'function') return;
+    GS.saveDisabled(FI.getDisabled());
+  }
 
   function loadLogo() {
     return new Promise((resolve) => {
@@ -45,7 +61,7 @@
     const parts = [`${item.w}×${item.h}px`, `waga ${item.weight}`];
     if (item.effect) parts.push(`efekt: ${item.effect}`);
     if (item.duration) parts.push(`${item.duration}s`);
-    if (item.pts) parts.push(`+${item.pts} pkt`);
+    if (item.pts) parts.push(`${item.pts > 0 ? '+' : ''}${item.pts} pkt`);
     if (item.minT) parts.push(`od ${item.minT}s`);
     if (item.speed) parts.push(`prędkość ×${item.speed}`);
     if (item.mover) parts.push('przejeżdża');
@@ -59,7 +75,8 @@
     const total = FI.CATALOG.length;
     const off = FI.getDisabled().length;
     document.getElementById('stats').textContent = `${total - off} / ${total} włączonych w grze`;
-    document.getElementById('disabled-json').textContent = JSON.stringify(FI.getDisabled());
+    const json = document.getElementById('disabled-json');
+    if (json) json.textContent = JSON.stringify(FI.getDisabled());
   }
 
   function render(filter = '') {
@@ -93,6 +110,17 @@
           const card = document.createElement('article');
           card.className = 'card' + (enabled ? '' : ' off');
           card.dataset.key = item.key;
+          const toggleHtml = ADMIN
+            ? `<div class="toggle-row">
+                <span class="toggle-label ${enabled ? '' : 'off'}">${enabled ? 'W grze' : 'Wyłączone'}</span>
+                <label class="switch" title="Włącz / wyłącz w rozgrywce">
+                  <input type="checkbox" ${enabled ? 'checked' : ''} data-key="${item.key}">
+                  <span class="slider"></span>
+                </label>
+              </div>`
+            : `<div class="toggle-row readonly">
+                <span class="toggle-label ${enabled ? '' : 'off'}">${enabled ? 'W grze' : 'Wyłączone'}</span>
+              </div>`;
           card.innerHTML = `
             <div class="preview-wrap">
               <span class="kind-tag kind-${item.kind}">${item.kind}</span>
@@ -103,13 +131,7 @@
               <div class="card-id">ID: ${item.key}</div>
               <p class="card-desc">${item.desc}</p>
               <div class="meta"><span>${metaLine(item)}</span></div>
-              <div class="toggle-row">
-                <span class="toggle-label ${enabled ? '' : 'off'}">${enabled ? 'W grze' : 'Wyłączone'}</span>
-                <label class="switch" title="Włącz / wyłącz w rozgrywce">
-                  <input type="checkbox" ${enabled ? 'checked' : ''} data-key="${item.key}">
-                  <span class="slider"></span>
-                </label>
-              </div>
+              ${toggleHtml}
             </div>`;
           grid.appendChild(card);
           const cv = card.querySelector('canvas');
@@ -121,24 +143,49 @@
       host.appendChild(section);
     }
 
-    host.querySelectorAll('.switch input').forEach((inp) => {
-      inp.addEventListener('change', () => {
-        FI.toggle(inp.dataset.key);
-        render(document.getElementById('search').value);
-        updateStats();
+    if (ADMIN) {
+      host.querySelectorAll('.switch input').forEach((inp) => {
+        inp.addEventListener('change', () => {
+          FI.toggle(inp.dataset.key);
+          persistDisabled();
+          render(document.getElementById('search').value);
+          updateStats();
+        });
       });
-    });
+    }
 
     updateStats();
   }
 
   document.getElementById('search').addEventListener('input', (e) => render(e.target.value));
-  document.getElementById('btn-all').addEventListener('click', () => { FI.enableAll(); render(document.getElementById('search').value); });
-  document.getElementById('btn-none').addEventListener('click', () => {
-    FI.disableKeys(FI.CATALOG.map((c) => c.key));
-    render(document.getElementById('search').value);
-  });
-  document.getElementById('btn-reset').addEventListener('click', () => { FI.enableAll(); render(document.getElementById('search').value); });
 
-  loadLogo().then(() => render());
+  const btnAll = document.getElementById('btn-all');
+  const btnNone = document.getElementById('btn-none');
+  const btnReset = document.getElementById('btn-reset');
+  if (ADMIN && btnAll && btnNone && btnReset) {
+    btnAll.addEventListener('click', () => {
+      FI.enableAll();
+      persistDisabled();
+      render(document.getElementById('search').value);
+    });
+    btnNone.addEventListener('click', () => {
+      FI.disableKeys(FI.CATALOG.map((c) => c.key));
+      persistDisabled();
+      render(document.getElementById('search').value);
+    });
+    btnReset.addEventListener('click', () => {
+      FI.enableAll();
+      persistDisabled();
+      render(document.getElementById('search').value);
+    });
+  }
+
+  Promise.resolve()
+    .then(() => loadLogo())
+    .then(() => (GS && typeof GS.hydrateFromServer === 'function' ? GS.hydrateFromServer() : null))
+    .catch((err) => console.warn('catalog hydrate', err))
+    .then(() => {
+      render();
+      FI.onPawelHeadReady(() => render(document.getElementById('search').value));
+    });
 })();

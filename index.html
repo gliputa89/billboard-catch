@@ -3,61 +3,68 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Billboard Catch — znajdzreklame.pl</title>
-  <meta name="description" content="Billboard Catch — łap reklamy, zdobywaj punkty, pobij rekord. Gra arcade od znajdzreklame.pl">
+  <title>Ads Catcher — znajdzreklame.pl</title>
+  <meta name="description" content="Ads Catcher — łap reklamy, zdobywaj punkty, pobij rekord. Gra arcade od znajdzreklame.pl">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=20260918o">
 </head>
 <body>
   <main class="stage">
     <div class="game-wrap" id="wrap">
       <div class="diff-badge hidden" id="diff-badge" aria-hidden="true">Normalny</div>
-      <canvas id="game" width="960" height="640" aria-label="Billboard Catch"></canvas>
+      <div class="debug-badge hidden" id="debug-badge" aria-hidden="true">Debug · bez końca · P/R/Z/B/T zrzuca item z góry</div>
+      <canvas id="game" width="960" height="640" aria-label="Ads Catcher"></canvas>
 
       <!-- EKRAN STARTOWY -->
       <section class="overlay" id="start">
         <div class="panel panel-start">
-          <nav class="start-tabs" role="tablist" aria-label="Menu startowe">
+          <nav class="start-tabs admin-only" role="tablist" aria-label="Menu startowe">
             <button type="button" class="start-tab active" data-tab="play" role="tab" aria-selected="true" id="tab-btn-play">Gra</button>
             <button type="button" class="start-tab" data-tab="settings" role="tab" aria-selected="false" id="tab-btn-settings">Ustawienia</button>
           </nav>
 
           <div class="start-tab-panel" id="tab-play" role="tabpanel">
-          <div class="brand-tag">
-            <img src="logo.svg" alt="znajdzreklame.pl" class="brand-logo brand-logo--start"
-                 onerror="this.onerror=null;this.src='https://www.znajdzreklame.pl/logo.svg'">
-            <span>przedstawia</span>
-          </div>
-          <h1 class="title"><span>BILLBOARD</span><span class="accent">CATCH</span></h1>
-          <p class="slogan">ZŁAP. ZDOBĄDŹ. POBIJ REKORD.</p>
+          <div class="start-layout">
+            <div class="start-main">
+              <div class="brand-tag">
+                <img src="logo-on-dark.svg" alt="znajdzreklame.pl" class="brand-logo brand-logo--start"
+                     onerror="this.onerror=null;this.src='logo.svg'">
+                <span>przedstawia</span>
+              </div>
+              <h1 class="title title--start"><span>ADS</span><span class="accent">CATCHER</span></h1>
+              <p class="slogan slogan--start">ZŁAP. ZDOBĄDŹ. POBIJ REKORD.</p>
 
-          <div class="cta">
-            <div class="cta-main">ZŁAP REKLAMĘ!</div>
-            <div class="cta-sub"><kbd>←</kbd> <kbd>→</kbd> poruszaj się</div>
-          </div>
+              <div class="cta cta--start">
+                <div class="cta-main">ZŁAP REKLAMĘ!</div>
+                <div class="cta-sub"><kbd>←</kbd> <kbd>→</kbd> poruszaj się</div>
+              </div>
 
-          <div class="legend">
-            <div class="legend-item good"><span class="dot"></span>ŁAP: reklamy, billboardy, DOOH, paczkomaty</div>
-            <div class="legend-item brand"><span class="dot"></span>ZBIERAJ: litery i logo znajdzreklame.pl → małe pkt + bonus za postęp, +10 000 za komplet</div>
-            <div class="legend-item bad"><span class="dot"></span>UNIKAJ: bomby, faktury, trudnych klientów, zniszczony format (−2)</div>
-            <div class="legend-item pu"><span class="dot"></span>POWER-UPY: serca, spowolnienie, zasięg, mini auto</div>
-          </div>
+              <div class="legend legend--start">
+                <div class="legend-item good"><span class="dot"></span>ŁAP: reklamy, billboardy, DOOH, nowy dostawca, +500, nowe billboardy w bazie</div>
+                <div class="legend-item bad"><span class="dot"></span>UNIKAJ: faktury, odklejony plakat, zgaszone światło, żurek/miniboard (−10k)</div>
+                <div class="legend-item pu"><span class="dot"></span>POWER-UPY: serca, spowolnienie, zasięg, ruletka</div>
+              </div>
 
-          <button class="btn btn-primary" id="btn-start">START</button>
-          <div class="hint">…albo naciśnij dowolny klawisz</div>
+              <button class="btn btn-primary" id="btn-start">START</button>
+              <div class="hint">…albo naciśnij dowolny klawisz</div>
+            </div>
 
-          <div class="mini-board">
-            <div class="mini-board-title">🏆 TOP 5</div>
-            <ol id="mini-board"></ol>
-            <div class="challenge" id="challenge"></div>
+            <aside class="start-leaderboard" aria-labelledby="start-board-heading">
+              <div class="board-title board-title--start" id="start-board-heading">🏆 ADS CATCHER — TOP 10</div>
+              <table class="board board--start">
+                <thead><tr><th>#</th><th>Gracz</th><th class="r">Wynik</th><th class="r board-when-h">Kiedy</th></tr></thead>
+                <tbody id="start-board-body"></tbody>
+              </table>
+              <div class="challenge challenge--start" id="challenge"></div>
+            </aside>
           </div>
           </div><!-- /tab-play -->
 
           <div class="start-tab-panel hidden" id="tab-settings" role="tabpanel">
             <h2 class="settings-title">Ustawienia gry</h2>
-            <p class="settings-sub">Dostosuj tempo i gęstość rozgrywki. Zapisuje się automatycznie.</p>
+            <p class="settings-sub">Dostosuj tempo i gęstość rozgrywki. Zapisuje się na serwerze dla wszystkich graczy.</p>
 
             <div class="preset-row" id="preset-row">
               <!-- wypełnia game.js -->
@@ -100,9 +107,9 @@
           </div>
 
           <div class="over-right">
-            <div class="board-title">🏆 BILLBOARD CATCH — TOP 10</div>
+            <div class="board-title">🏆 ADS CATCHER — TOP 10</div>
             <table class="board">
-              <thead><tr><th>#</th><th>Gracz</th><th class="r">Wynik</th></tr></thead>
+              <thead><tr><th>#</th><th>Gracz</th><th class="r">Wynik</th><th class="r board-when-h">Kiedy</th></tr></thead>
               <tbody id="board-body"></tbody>
             </table>
             <div class="challenge" id="challenge-over"></div>
@@ -122,14 +129,15 @@
            onerror="this.onerror=null;this.src='https://www.znajdzreklame.pl/logo.svg'">
       <span class="foot-sep">•</span>
       <span>Billboardy • Citylighty • Wielki Format • Oklejanie autobusów</span>
-      <a class="foot-link" href="assets/">Katalog assetów</a>
-      <button type="button" class="foot-link foot-btn" id="btn-open-settings">Ustawienia</button>
+      <a class="foot-link admin-only" href="assets/">Katalog assetów</a>
+      <button type="button" class="foot-link foot-btn admin-only" id="btn-open-settings">Ustawienia</button>
       <button class="mute" id="btn-mute" title="Dźwięk (M)" aria-label="Wyłącz dźwięk">🔊</button>
     </footer>
   </main>
 
-  <script src="lib/falling-items.js"></script>
-  <script src="lib/game-settings.js"></script>
-  <script src="game.js"></script>
+  <script src="lib/falling-items.js?v=20260918z"></script>
+  <script src="lib/game-settings.js?v=20260918e"></script>
+  <script src="lib/xano-leaderboard.js?v=20260918l"></script>
+  <script src="game.js?v=20260918u"></script>
 </body>
 </html>

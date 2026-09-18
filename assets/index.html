@@ -3,17 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Katalog assetów — Billboard Catch</title>
+  <title>Katalog assetów — Ads Catcher</title>
   <link rel="icon" href="../logo.svg" type="image/svg+xml">
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="catalog.css">
+  <link rel="stylesheet" href="catalog.css?v=20260918a">
 </head>
 <body>
   <header class="top">
     <div class="top-left">
       <a class="back" href="../">← Gra</a>
       <h1>Katalog spadających assetów</h1>
-      <p class="sub">Podgląd wszystkich elementów z nazwami i ID. Wyłączone pozycje <b>nie pojawiają się w grze</b> (zapis w przeglądarce).</p>
+      <p class="sub" id="catalog-sub">Podgląd wszystkich elementów z nazwami i ID. Lista włączonych w grze jest wspólna i pochodzi z serwera.</p>
     </div>
     <div class="top-right">
       <img src="../logo.svg" alt="znajdzreklame.pl" class="logo" onerror="this.src='https://www.znajdzreklame.pl/logo.svg'">
@@ -23,7 +23,7 @@
 
   <div class="toolbar">
     <input type="search" id="search" placeholder="Szukaj po nazwie, ID, opisie…" autocomplete="off">
-    <div class="toolbar-btns">
+    <div class="toolbar-btns admin-only">
       <button type="button" id="btn-all">Włącz wszystkie</button>
       <button type="button" id="btn-none">Wyłącz wszystkie</button>
       <button type="button" id="btn-reset">Reset (domyślne)</button>
@@ -33,12 +33,14 @@
   <main id="sections"></main>
 
   <footer class="foot">
-    <span>Wyłączone ID:</span>
-    <code id="disabled-json">[]</code>
-    <span class="foot-note">Billboard Catch • znajdzreklame.pl</span>
+    <span class="admin-only">Wyłączone ID:</span>
+    <code class="admin-only" id="disabled-json">[]</code>
+    <span class="foot-note">Ads Catcher • znajdzreklame.pl</span>
   </footer>
 
-  <script src="../lib/falling-items.js"></script>
-  <script src="catalog.js"></script>
+  <script src="../lib/falling-items.js?v=20260918z"></script>
+  <script src="../lib/game-settings.js?v=20260918e"></script>
+  <script src="../lib/xano-leaderboard.js?v=20260918l"></script>
+  <script src="catalog.js?v=20260918a"></script>
 </body>
 </html>
