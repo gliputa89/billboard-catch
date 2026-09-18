@@ -128,7 +128,8 @@ Wszystkie parametry balansu są w `game.js` i `lib/falling-items.js`:
 
 - `ITEMS` — rodzaje elementów, punkty, rozmiary, wagi losowania, od której sekundy się pojawiają (`minT`);
 - `diff` — krzywe trudności (prędkość, częstość spawnów, udział przeszkód, spawny „parami”);
-- `START_LIVES`, `DOUBLE_DURATION` — liczba żyć i długość bonusu 2x;
+- `startLives` / `maxLives` w `lib/game-settings.js` (`toConfig`) — startowe życia (5) i limit (`0` = bez limitu);
+- `DOUBLE_DURATION` — długość bonusu 2x;
 - kolory marki w `style.css` (`--brand`, `--brand-2`).
 
 ## Pliki

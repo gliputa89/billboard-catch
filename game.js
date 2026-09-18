@@ -23,8 +23,6 @@
   const PENALTY_PTS = 10000;
   const ZUREK_FLY_COUNT = 36;
   const ZUREK_FLY_AFTER = 5;
-  const START_LIVES = 4;
-  const MAX_LIVES = 5;
   const PLAYER_BASE_W = 124;
   const CAR_BASE_MAXV = 820;
   const CAR_BASE_ACC = 4400;
@@ -1692,13 +1690,29 @@
     el.textContent = gameCfg.presetLabel;
   }
 
+  function startLives() {
+    const n = Number(gameCfg.startLives);
+    return Number.isFinite(n) && n > 0 ? n : 5;
+  }
+
+  function maxLives() {
+    const n = Number(gameCfg.maxLives);
+    return Number.isFinite(n) && n > 0 ? n : Infinity;
+  }
+
+  function gainLives(n) {
+    const before = G.lives;
+    G.lives = Math.min(maxLives(), G.lives + n);
+    return G.lives > before;
+  }
+
   function resetRun() {
     refreshGameConfig();
     const c = gameCfg;
     Object.assign(G, {
       time: 0,
       score: 0,
-      lives: START_LIVES,
+      lives: startLives(),
       combo: 0,
       bestCombo: 0,
       caught: 0,
@@ -1958,10 +1972,7 @@
       case "heart":
         G.flash = 0.25;
         G.flashColor = "255,107,138";
-        if (G.lives < MAX_LIVES) {
-          G.lives++;
-          return "+1 ŻYCIE!";
-        }
+        if (gainLives(1)) return "+1 ŻYCIE!";
         return "PEŁNE ŻYCIA!";
       case "slowFall":
         G.pu.slowFall = dur;
@@ -2171,11 +2182,9 @@
   function applyRoulettePrize(slot) {
     if (slot.kind === "life") {
       if (slot.n > 0) {
-        const before = G.lives;
-        G.lives = Math.min(MAX_LIVES, G.lives + slot.n);
         G.flash = 0.32;
         G.flashColor = "34,224,122";
-        if (G.lives === before) return "PEŁNE ŻYCIA!";
+        if (!gainLives(slot.n)) return "PEŁNE ŻYCIA!";
         return slot.label;
       }
       G.flash = 0.35;
@@ -2825,7 +2834,8 @@
         lw: 4,
       });
     } else {
-      const showLives = Math.max(START_LIVES, Math.min(G.lives, MAX_LIVES));
+      const cap = maxLives();
+      const showLives = Math.max(startLives(), Number.isFinite(cap) ? Math.min(G.lives, cap) : G.lives);
       for (let i = 0; i < showLives; i++)
         heart(
           W - 30 - i * 34,
