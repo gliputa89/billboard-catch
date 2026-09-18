@@ -2643,6 +2643,24 @@
   // Aktualizacja
   // ------------------------------------------------------------------
   const keys = { left: false, right: false };
+  const held = {
+    kb: { left: false, right: false },
+    ptr: { left: false, right: false },
+    pad: { left: false, right: false },
+  };
+  function syncKeys() {
+    keys.left = held.kb.left || held.ptr.left || held.pad.left;
+    keys.right = held.kb.right || held.ptr.right || held.pad.right;
+  }
+  function clearHeld() {
+    held.kb.left = held.kb.right = false;
+    held.ptr.left = held.ptr.right = false;
+    held.pad.left = held.pad.right = false;
+    syncKeys();
+    document.querySelectorAll(".mobile-arrow.is-held").forEach((el) => {
+      el.classList.remove("is-held");
+    });
+  }
 
   function update(dt) {
     const t = (G.time += dt);
@@ -3747,16 +3765,25 @@
       showBanner("DEBUG", "Bez żyć — gra bez końca", 2.4, "#5eead4");
       const db = $("#debug-badge");
       if (db) db.classList.remove("hidden");
-    } else showBanner("ZŁAP REKLAMĘ!", "← →  poruszaj się", 2.2, "#ffb703");
+    } else
+      showBanner(
+        "ZŁAP REKLAMĘ!",
+        document.body.classList.contains("mobile-layout")
+          ? "strzałki po bokach"
+          : "← →  poruszaj się",
+        2.2,
+        "#ffb703",
+      );
     sfx.start();
     startMusic();
+    tryLockLandscape();
   }
 
   function endGame() {
     if (state !== "play") return;
     state = "over";
     $("#diff-badge").classList.add("hidden");
-    keys.left = keys.right = false;
+    clearHeld();
     stopMusic(true);
     sfx.over();
     const score = Math.round(G.score);
@@ -3842,11 +3869,13 @@
       return;
     }
     if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
-      keys.left = true;
+      held.kb.left = true;
+      syncKeys();
       e.preventDefault();
     }
     if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
-      keys.right = true;
+      held.kb.right = true;
+      syncKeys();
       e.preventDefault();
     }
     if (
@@ -3868,21 +3897,24 @@
     }
   });
   window.addEventListener("keyup", (e) => {
-    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A")
-      keys.left = false;
-    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D")
-      keys.right = false;
+    if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") {
+      held.kb.left = false;
+      syncKeys();
+    }
+    if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") {
+      held.kb.right = false;
+      syncKeys();
+    }
   });
-  window.addEventListener("blur", () => {
-    keys.left = keys.right = false;
-  });
+  window.addEventListener("blur", clearHeld);
 
   // dotyk / mysz: lewa lub prawa połowa ekranu
   const activePointers = new Map();
   function updatePointerKeys() {
-    keys.left = false;
-    keys.right = false;
-    for (const side of activePointers.values()) keys[side] = true;
+    held.ptr.left = false;
+    held.ptr.right = false;
+    for (const side of activePointers.values()) held.ptr[side] = true;
+    syncKeys();
   }
   canvas.addEventListener("pointerdown", (e) => {
     if (state !== "play") return;
@@ -3909,6 +3941,72 @@
   };
   canvas.addEventListener("pointerup", releasePointer);
   canvas.addEventListener("pointercancel", releasePointer);
+
+  function bindPad(el, dir) {
+    if (!el) return;
+    const down = (e) => {
+      e.preventDefault();
+      held.pad[dir] = true;
+      el.classList.add("is-held");
+      syncKeys();
+      try {
+        el.setPointerCapture(e.pointerId);
+      } catch {
+        /* ignore */
+      }
+    };
+    const up = () => {
+      held.pad[dir] = false;
+      el.classList.remove("is-held");
+      syncKeys();
+    };
+    el.addEventListener("pointerdown", down);
+    el.addEventListener("pointerup", up);
+    el.addEventListener("pointercancel", up);
+    el.addEventListener("lostpointercapture", up);
+  }
+  bindPad($("#pad-left"), "left");
+  bindPad($("#pad-right"), "right");
+
+  function isTouchUi() {
+    return (
+      (navigator.maxTouchPoints || 0) > 0 ||
+      window.matchMedia("(pointer: coarse)").matches
+    );
+  }
+  function syncMobileLayout() {
+    const touch = isTouchUi();
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const portrait = h > w + 24;
+    const phonePortrait = portrait && w <= 820;
+    const phoneLandscape = !portrait && h <= 560 && w <= 1100;
+    const mobile =
+      (touch && Math.min(w, h) <= 920) || phonePortrait || phoneLandscape;
+    document.body.classList.toggle("touch-ui", touch || mobile);
+    document.body.classList.toggle("mobile-layout", mobile && !phonePortrait);
+    document.body.classList.toggle("portrait-phone", phonePortrait);
+    const hint = $("#rotate-hint");
+    if (hint) {
+      hint.hidden = !phonePortrait;
+      hint.setAttribute("aria-hidden", phonePortrait ? "false" : "true");
+    }
+  }
+  function tryLockLandscape() {
+    try {
+      const o = screen.orientation;
+      if (o && typeof o.lock === "function") {
+        o.lock("landscape").catch(() => {});
+      }
+    } catch {
+      /* iOS / brak uprawnień */
+    }
+  }
+  syncMobileLayout();
+  window.addEventListener("resize", syncMobileLayout);
+  window.addEventListener("orientationchange", () => {
+    setTimeout(syncMobileLayout, 250);
+  });
 
   $("#btn-start").addEventListener("click", startGame);
   $("#btn-again").addEventListener("click", startGame);

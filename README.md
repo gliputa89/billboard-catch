@@ -18,13 +18,15 @@ python3 -m http.server 8080
 # → http://localhost:8080
 ```
 
-Działa w każdej nowoczesnej przeglądarce (Chrome, Edge, Firefox, Safari). Na ekranie dotykowym: dotknij lewej/prawej połowy ekranu.
+Działa w każdej nowoczesnej przeglądarce (Chrome, Edge, Firefox, Safari). Na telefonie gra jest **w poziomie**: obróć urządzenie, a po bokach pojawią się strzałki lewo/prawo.
 
 ## Sterowanie
 
-| Klawisz | Akcja |
+| Klawisz / gest | Akcja |
 |---|---|
 | `←` `→` (lub `A` `D`) | jazda w lewo / w prawo |
+| strzałki po bokach (telefon) | jazda w lewo / w prawo (przytrzymaj) |
+| lewa / prawa połowa ekranu | to samo na tablecie i ekranie dotykowym |
 | dowolny klawisz | start gry |
 | `Enter` / `Spacja` | szybki restart po przegranej |
 | `M` | wyłącz / włącz dźwięk i muzykę |

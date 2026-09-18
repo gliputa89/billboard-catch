@@ -2,17 +2,33 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#101426">
   <title>Ads Catcher — znajdzreklame.pl</title>
   <meta name="description" content="Ads Catcher — łap reklamy, zdobywaj punkty, pobij rekord. Gra arcade od znajdzreklame.pl">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;900&display=swap" rel="stylesheet">
   <link rel="icon" href="logo.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="style.css?v=20260918o">
+  <link rel="stylesheet" href="style.css?v=20260918r">
 </head>
 <body>
+  <div class="rotate-hint" id="rotate-hint" hidden role="dialog" aria-labelledby="rotate-title" aria-modal="true">
+    <div class="rotate-card">
+      <div class="rotate-phone" aria-hidden="true"></div>
+      <p id="rotate-title">Obróć telefon <strong>w poziomie</strong></p>
+      <span>Gra jest na ekran panoramiczny — sterujesz strzałkami po bokach</span>
+    </div>
+  </div>
+
   <main class="stage">
-    <div class="game-wrap" id="wrap">
+    <div class="playfield">
+      <button type="button" class="mobile-arrow mobile-arrow--left" id="pad-left" aria-label="Jedź w lewo" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15.4 4.6 8 12l7.4 7.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <div class="game-wrap" id="wrap">
       <div class="diff-badge hidden" id="diff-badge" aria-hidden="true">Normalny</div>
       <div class="debug-badge hidden" id="debug-badge" aria-hidden="true">Debug · bez końca · P/R/Z/B/T zrzuca item z góry</div>
       <canvas id="game" width="960" height="640" aria-label="Ads Catcher"></canvas>
@@ -38,7 +54,8 @@
 
               <div class="cta cta--start">
                 <div class="cta-main">ZŁAP REKLAMĘ!</div>
-                <div class="cta-sub"><kbd>←</kbd> <kbd>→</kbd> poruszaj się</div>
+                <div class="cta-sub cta-sub--desk"><kbd>←</kbd> <kbd>→</kbd> poruszaj się</div>
+                <div class="cta-sub cta-sub--touch">trzymaj strzałki po bokach</div>
               </div>
 
               <div class="legend legend--start">
@@ -48,7 +65,8 @@
               </div>
 
               <button class="btn btn-primary" id="btn-start">START</button>
-              <div class="hint">…albo naciśnij dowolny klawisz</div>
+              <div class="hint hint--desk">…albo naciśnij dowolny klawisz</div>
+              <div class="hint hint--touch">dotknij START</div>
             </div>
 
             <aside class="start-leaderboard" aria-labelledby="start-board-heading">
@@ -101,7 +119,8 @@
             </div>
 
             <button class="btn btn-primary" id="btn-again">ZAGRAJ JESZCZE RAZ</button>
-            <div class="hint">Enter / Spacja — szybki restart</div>
+            <div class="hint hint--desk">Enter / Spacja — szybki restart</div>
+            <div class="hint hint--touch">dotknij, żeby zagrać jeszcze raz</div>
           </div>
 
           <div class="over-right">
@@ -120,6 +139,10 @@
           </div>
         </div>
       </section>
+      </div><!-- /game-wrap -->
+      <button type="button" class="mobile-arrow mobile-arrow--right" id="pad-right" aria-label="Jedź w prawo" tabindex="-1">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 4.6 16 12l-7.4 7.4" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
 
     <footer class="page-footer">
@@ -136,6 +159,6 @@
   <script src="lib/falling-items.js?v=20260918za"></script>
   <script src="lib/game-settings.js?v=20260918f"></script>
   <script src="lib/xano-leaderboard.js?v=20260918l"></script>
-  <script src="game.js?v=20260918v"></script>
+  <script src="game.js?v=20260918w"></script>
 </body>
 </html>
